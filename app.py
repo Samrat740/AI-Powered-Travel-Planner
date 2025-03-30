@@ -97,4 +97,3 @@ st.markdown("""
     <p style='text-align: center; font-size: 14px; margin: 0;'>Developed by <b>Samrat Ghosh</b></p>
     <p style='text-align: center; font-size: 11px; margin: 0;'>Version <b>04.25.01</b></p>
 """, unsafe_allow_html=True)
-
