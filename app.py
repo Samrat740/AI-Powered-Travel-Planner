@@ -10,25 +10,55 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 
 st.title("✈️ AI-Powered Travel Planner")
 
-# User inputs
-destination = st.text_input("Enter Your Destination:")
-days = st.slider("Number of Days:", 1, 10, 3)
-budget = st.selectbox("Select Budget Level:", ["Low", "Medium", "High"])
+# ✅ Session states for toggling visibility
+if "custom_prompt" not in st.session_state:
+    st.session_state.custom_prompt = ""
+if "show_custom_prompt" not in st.session_state:
+    st.session_state.show_custom_prompt = False
+if "toggle_button_text" not in st.session_state:
+    st.session_state.toggle_button_text = "✍️ Write your own instead? Click here!"
 
-# ✅ Additional Specifications Dropdown
-with st.expander("🛠️ Additional Specifications"):
-    col1, col2 = st.columns(2)  # 2x2 Grid Layout
+# ✅ Toggle function to hide/show fields
+def toggle_prompt():
+    st.session_state.show_custom_prompt = not st.session_state.show_custom_prompt
+    if not st.session_state.show_custom_prompt:
+        st.session_state.custom_prompt = ""  # Clear text when closing
+    st.session_state.toggle_button_text = "🏞️ Prefer choosing? Click here!" if st.session_state.show_custom_prompt else "✍️ Write your own instead? Click here!"
 
-    with col1:
-        interest_type = st.selectbox("Preferred Activities", ["Cultural", "Adventure", "Relaxation", "Food Tour", "Nightlife"])
-        walking = st.selectbox("Walking Tolerance", ["High - Love exploring on foot!", "Moderate - Some walking is okay.", "Low - Prefer minimal walking."])
+# ✅ Center the toggle button
+col1, col2, col3 = st.columns([1, 2, 1])  
+with col2:
+    if st.button(st.session_state.toggle_button_text, on_click=toggle_prompt):
+        pass  
 
-    with col2:
-        diet = st.selectbox("Dietary Preferences", ["No Preference", "Veg-Food", "Non-Veg"])
-        accommodation = st.selectbox("Accommodation Type", ["Budget", "Mid-range", "Luxury", "Near City Center", "Quiet Location"])
+# ✅ Default values (Prevents NameError)
+destination, days, budget, interest_type, diet, walking, accommodation = "", 3, "Medium", "Cultural", "No Preference", "Moderate", "Mid-range"
 
-# Generate Itinerary Button
-if st.button("Generate Itinerary"):
+# ✅ Show inputs **only** when "Custom Prompt" is NOT selected
+if not st.session_state.show_custom_prompt:
+    destination = st.text_input("Enter Your Destination:")
+    days = st.slider("Number of Days:", 1, 10, 3)
+    budget = st.selectbox("Select Budget Level:", ["Low", "Medium", "High"])
+
+    with st.expander("🛠️ Additional Specifications"):
+        col1, col2 = st.columns(2)  
+
+        with col1:
+            interest_type = st.selectbox("Preferred Activities", ["Cultural", "Adventure", "Relaxation", "Food Tour", "Nightlife"])
+            walking = st.selectbox("Walking Tolerance", ["High - Love exploring on foot!", "Moderate - Some walking is okay.", "Low - Prefer minimal walking."])
+
+        with col2:
+            diet = st.selectbox("Dietary Preferences", ["No Preference", "Veg-Food", "Non-Veg"])
+            accommodation = st.selectbox("Accommodation Type", ["Budget", "Mid-range", "Luxury", "Near City Center", "Quiet Location"])
+
+# ✅ Always show the custom prompt field when toggled
+if st.session_state.show_custom_prompt:
+    st.session_state.custom_prompt = st.text_area("📌 Tell us what you're looking for:", value=st.session_state.custom_prompt)
+
+# ✅ Determine which prompt to use
+if st.session_state.custom_prompt.strip():
+    user_prompt = st.session_state.custom_prompt
+else:
     user_prompt = f"""
     Plan a {days}-day trip to {destination} with a {budget} budget.
     User prefers {interest_type} activities, follows a {diet} diet,
@@ -36,7 +66,12 @@ if st.button("Generate Itinerary"):
     Provide a detailed structured itinerary.
     """
 
-    # 🔄 Dynamic Loading Animation (HTML + CSS + Rotating Text)
+# ✅ Generate Itinerary Button
+if st.button("✈️ Build My Travel Plan"):
+    loading_messages = ["⏳ Planning your trip...", "🚀 Finding the best places...", "🌍 Creating your itinerary..."]
+    loading_placeholder = st.empty()
+
+# 🔄 Dynamic Loading Animation (HTML + CSS + Rotating Text)
     loading_html_template = """
     <div id="loading-overlay">
         <div class="loading-spinner"></div>
@@ -95,5 +130,5 @@ if st.button("Generate Itinerary"):
 st.markdown("""
     <hr style="margin: 5px 0;">
     <p style='text-align: center; font-size: 14px; margin: 0;'>Developed by <b>Samrat Ghosh</b></p>
-    <p style='text-align: center; font-size: 11px; margin: 0;'>Version <b>04.25.01</b></p>
+    <!-- <p style='text-align: center; font-size: 11px; margin: 0;'>Version <b>04.25.01</b></p> -->
 """, unsafe_allow_html=True)
