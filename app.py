@@ -18,13 +18,6 @@ api_key = os.getenv("GENAI_API_KEY")
 # Configure Google Gemini API
 genai.configure(api_key=api_key)
 
-# ✅ Debugging: Check if API Key is loaded correctly
-if not api_key:
-    st.error("❌ API Key is missing! Make sure you've added it in .env or Streamlit secrets.")
-else:
-    st.success("✅ API Key loaded successfully.")
-
-
 # ✅ Use a valid Gemini model
 model = genai.GenerativeModel("gemini-1.5-flash")  
 
