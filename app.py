@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import google.generativeai as genai
 from dotenv import load_dotenv
+import time
 
 # ✅ Ensure API key is available (Locally: .env | Streamlit: st.secrets)
 if "GENAI_API_KEY" in st.secrets and not os.path.exists(".env"):
